@@ -1,0 +1,56 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.venv/
+venv/
+env/
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+frontend/dist/
+frontend/build/
+*.tsbuildinfo
+
+# ── Environment variables ─────────────────────────────────────────────────────
+# Keep .env.example, ignore actual .env files
+.env
+.env.local
+.env.*.local
+# Exception: committed example env files are OK
+!.env.example
+!frontend/.env.example
+
+# ── Large ML training data (not needed at runtime) ───────────────────────────
+# campaign_history.json is only used during model training (~70MB).
+# Generate it locally by running: python ml/generate_data.py
+data/campaign_history.json
+
+# ── Runtime ML artifacts (committed — required for the app to run) ────────────
+# These are pre-computed and small enough for git:
+#   data/customers.json       (~5MB)
+#   data/uplift_scores.json   (~2MB)
+#   data/model_meta.json      (~8MB)
+# If you delete them, re-run: python ml/train_model.py
+
+# ── Editor / OS ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Vercel ────────────────────────────────────────────────────────────────────
+.vercel/
