@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg:        #0b1120;
+    --color-surface:   #111827;
+    --color-border:    #1f2937;
+    --color-muted:     #374151;
+    --color-text:      #f9fafb;
+    --color-text-muted:#9ca3af;
+    --color-upay:      #1793e8;
+    --color-upay-dark: #0c5da0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #0b1120;
+    color: #f9fafb;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #111827; }
+  ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+}
+
+@layer components {
+  /* Card */
+  .card {
+    @apply bg-slate-900 border border-slate-800 rounded-xl;
+  }
+
+  /* KPI Card */
+  .kpi-card {
+    @apply card p-5 flex flex-col gap-1.5;
+  }
+
+  /* Sidebar link */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400
+           transition-colors duration-150 cursor-pointer;
+  }
+  .nav-link:hover {
+    @apply text-white bg-slate-800;
+  }
+  .nav-link.active {
+    @apply text-white bg-upay-700/50 border border-upay-700/30;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-green   { @apply badge bg-emerald-900/60 text-emerald-400 border border-emerald-800/40; }
+  .badge-yellow  { @apply badge bg-amber-900/60   text-amber-400   border border-amber-800/40; }
+  .badge-red     { @apply badge bg-red-900/60     text-red-400     border border-red-800/40; }
+  .badge-blue    { @apply badge bg-upay-900/60    text-upay-400    border border-upay-800/40; }
+  .badge-slate   { @apply badge bg-slate-800      text-slate-300   border border-slate-700; }
+  .badge-purple  { @apply badge bg-purple-900/60  text-purple-400  border border-purple-800/40; }
+
+  /* Segment badges */
+  .segment-high_value { @apply badge-blue; }
+  .segment-mid        { @apply badge-green; }
+  .segment-low        { @apply badge-yellow; }
+  .segment-dormant    { @apply badge-slate; }
+
+  /* Button */
+  .btn-primary {
+    @apply px-4 py-2.5 rounded-lg bg-upay-600 hover:bg-upay-500 text-white font-semibold text-sm
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-sm
+           border border-slate-700 transition-colors duration-150;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white
+           placeholder-slate-500 focus:outline-none focus:border-upay-600 focus:ring-1 focus:ring-upay-600
+           transition-colors duration-150;
+  }
+
+  /* Select */
+  .select {
+    @apply input appearance-none cursor-pointer;
+  }
+
+  /* Table */
+  .data-table {
+    @apply w-full text-sm border-collapse;
+  }
+  .data-table th {
+    @apply text-left text-xs font-semibold text-slate-400 uppercase tracking-wider
+           px-4 py-3 border-b border-slate-800 bg-slate-900/50 whitespace-nowrap;
+  }
+  .data-table td {
+    @apply px-4 py-3 border-b border-slate-800/60 text-slate-300;
+  }
+  .data-table tbody tr:hover td {
+    @apply bg-slate-800/30;
+  }
+
+  /* Section header */
+  .section-title {
+    @apply text-base font-semibold text-white mb-4;
+  }
+
+  /* Uplift bar */
+  .uplift-bar-track {
+    @apply h-1.5 rounded-full bg-slate-700 overflow-hidden;
+  }
+  .uplift-bar-fill-positive {
+    @apply h-full rounded-full bg-gradient-to-r from-upay-600 to-emerald-500;
+  }
+  .uplift-bar-fill-negative {
+    @apply h-full rounded-full bg-red-600;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  /* Animate stagger children */
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 60ms; }
+  .stagger > *:nth-child(3) { animation-delay: 120ms; }
+  .stagger > *:nth-child(4) { animation-delay: 180ms; }
+  .stagger > *:nth-child(5) { animation-delay: 240ms; }
+  .stagger > *:nth-child(6) { animation-delay: 300ms; }
+}
