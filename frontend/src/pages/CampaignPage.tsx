@@ -116,7 +116,7 @@ export function CampaignPage() {
   const estReach = Math.floor(config.budget_bdt / config.offer_value_bdt);
 
   return (
-    <div className="flex h-full flex-col lg:flex-row overflow-hidden bg-[#f8fafc]">
+    <div className="flex h-full flex-col lg:flex-row overflow-y-auto lg:overflow-hidden bg-[#f8fafc]">
       {/* ── Left panel: Campaign Studio Planning Workspace ──────────────── */}
       <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white flex flex-col h-auto lg:h-full shadow-xs">
         {/* Studio Header */}

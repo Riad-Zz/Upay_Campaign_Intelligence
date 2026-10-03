@@ -276,7 +276,7 @@ export function DashboardPage() {
 
                 {/* Segment Filter Pill Buttons */}
                 <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 self-start sm:self-auto">
-                  {(['all', 'high_value', 'mid', 'low'] as const).map((tab) => (
+                  {([] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}

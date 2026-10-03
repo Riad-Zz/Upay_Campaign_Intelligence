@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/Deployment-Vercel%20Ready-000000?logo=vercel&logoColor=white" alt="Vercel" />
 </p>
 
+**Live Link** : https://upay-campaign-intelligence-frontend.vercel.app/
 ---
 
 ## 1. Project Overview
@@ -337,7 +338,9 @@ VITE_API_URL=http://localhost:3001
 ## 10. Live Deployment Status
 
 - **Current Prototype Status**: The application is configured and validated for local execution (`http://localhost:5173` frontend and `http://localhost:3001` backend).
-- **Cloud Deployment Ready**: The repository includes complete deployment configurations (`frontend/vercel.json` and `backend/vercel.json`) for multi-project serverless deployment on **Vercel**.
+- **Cloud Deployment Ready**: The repository includes complete deployment on (
+    Frontent : `https://upay-campaign-intelligence-frontend.vercel.app/` and 
+    Backend : `https://upay-campaign-intelligence-backend.vercel.app/`)  **Vercel**.
 - Detailed cloud deployment instructions are documented in [hosting.md](hosting.md).
 
 ---
