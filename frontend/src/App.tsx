@@ -8,9 +8,10 @@ import { CustomersPage } from './pages/CustomersPage';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex h-screen overflow-hidden bg-[#0b1120]">
+      {/* Desktop: flex row with sidebar. Mobile: flex column with top nav bar */}
+      <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#f8fafc] text-slate-900">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-w-0">
           <Routes>
             <Route path="/"          element={<DashboardPage />} />
             <Route path="/campaign"  element={<CampaignPage />} />
