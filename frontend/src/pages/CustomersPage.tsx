@@ -58,9 +58,9 @@ export function CustomersPage() {
   });
 
   return (
-    <div className="flex h-full flex-col lg:flex-row overflow-hidden bg-[#f8fafc]">
+    <div className="flex h-full flex-col lg:flex-row overflow-y-auto lg:overflow-hidden bg-[#f8fafc]">
       {/* ── Main Explorer Table Panel ─────────────────────────────────── */}
-      <div className={`flex flex-col ${selectedId ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-full'} min-w-0 h-full border-r border-slate-200 transition-all duration-300`}>
+      <div className={`flex flex-col ${selectedId ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-full'} flex-none h-[80vh] lg:h-full min-w-0 border-b lg:border-b-0 lg:border-r border-slate-200 transition-all duration-300`}>
         {/* Toolbar Header */}
         <div className="px-4 md:px-6 py-4 border-b border-slate-200 bg-white space-y-3 flex-shrink-0 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -206,7 +206,7 @@ export function CustomersPage() {
 
       {/* ── Customer Detail Slide-out / Side Panel ───────────────────────── */}
       {selectedId && (
-        <div className="w-full lg:w-2/5 xl:w-1/3 h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-white overflow-hidden flex flex-col shadow-lg animate-fade-in">
+        <div className="w-full lg:w-2/5 xl:w-1/3 flex-none min-h-[80vh] lg:min-h-0 lg:h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-white overflow-hidden flex flex-col shadow-lg animate-fade-in">
           <CustomerDetailPanel
             customerId={selectedId}
             onClose={() => setSelectedId(null)}

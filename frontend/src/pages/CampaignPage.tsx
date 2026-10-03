@@ -326,7 +326,7 @@ export function CampaignPage() {
       </div>
 
       {/* ── Right panel: Results / Analysis Experience / Empty State ─────── */}
-      <div className="flex-1 overflow-y-auto bg-[#f8fafc] p-4 md:p-6 lg:p-8">
+      <div className="flex-none lg:flex-1 min-h-[80vh] lg:min-h-0 overflow-y-auto bg-[#f8fafc] p-4 md:p-6 lg:p-8">
         {isAnalyzing && (
           <AnalysisExperience currentStep={analysisStep} />
         )}
