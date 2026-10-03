@@ -70,22 +70,63 @@ function listCustomers(req, res) {
     const slice    = customers.slice(start, start + limitNum);
 
     // Project fields for list view (keep response lean)
-    const projected = slice.map(c => ({
-      customer_id:                  c.customer_id,
-      segment:                      c.segment,
-      tenure_months:                c.tenure_months,
-      avg_monthly_gmv_bdt:          c.avg_monthly_gmv_bdt,
-      avg_monthly_txn_count:        c.avg_monthly_txn_count,
-      days_since_last_txn:          c.days_since_last_txn,
-      is_dormant:                   c.is_dormant,
-      campaign_received_last_90d:   c.campaign_received_last_90d,
-      campaign_responded_last_90d:  c.campaign_responded_last_90d,
-      preferred_category:           c.preferred_category,
-      fatigue_status:               c.fatigue_status,
-      uplift_scores: Object.fromEntries(
-        VALID_CAMPAIGN_TYPES.map(ct => [ct, +(c.uplift_scores?.[ct]?.uplift ?? 0).toFixed(4)])
-      ),
-    }));
+    const projected = slice.map(c => {
+      // Build per-campaign-type score detail (uplift, baseline, campaign prob)
+      const scores = Object.fromEntries(
+        VALID_CAMPAIGN_TYPES.map(ct => {
+          const s = c.uplift_scores?.[ct] || {};
+          return [ct, {
+            uplift:        +(s.uplift          ?? 0).toFixed(4),
+            control_prob:  +(s.control_prob    ?? 0).toFixed(4),
+            treatment_prob: +(s.treatment_prob ?? 0).toFixed(4),
+          }];
+        })
+      );
+
+      // Recommended action based on preferred category uplift
+      const preferredCt  = c.preferred_category || 'recharge';
+      const primaryScore = c.uplift_scores?.[preferredCt] || {};
+      const uplift       = primaryScore.uplift  ?? 0;
+      const controlProb  = primaryScore.control_prob ?? 0;
+      let recommended_action  = 'do_not_target';
+      let recommended_incentive = 0;
+      if (c.fatigue_status === 'suppressed') {
+        recommended_action = 'suppressed_fatigue';
+      } else if (uplift < 0) {
+        recommended_action = 'do_not_disturb';
+      } else if (uplift < 0.03 && controlProb > 0.65) {
+        recommended_action = 'sure_thing';
+      } else if (uplift < 0.03) {
+        recommended_action = 'low_value';
+      } else if (uplift >= 0.10) {
+        recommended_action = 'target';
+        recommended_incentive = uplift >= 0.20 ? 50 : uplift >= 0.15 ? 30 : 20;
+      } else {
+        recommended_action = 'target_low_incentive';
+        recommended_incentive = 10;
+      }
+
+      return {
+        customer_id:                  c.customer_id,
+        segment:                      c.segment,
+        tenure_months:                c.tenure_months,
+        avg_monthly_gmv_bdt:          c.avg_monthly_gmv_bdt,
+        avg_monthly_txn_count:        c.avg_monthly_txn_count,
+        days_since_last_txn:          c.days_since_last_txn,
+        is_dormant:                   c.is_dormant,
+        campaign_received_last_90d:   c.campaign_received_last_90d,
+        campaign_responded_last_90d:  c.campaign_responded_last_90d,
+        preferred_category:           c.preferred_category,
+        fatigue_status:               c.fatigue_status,
+        recommended_action,
+        recommended_incentive,
+        // Backward-compatible uplift_scores (number only) + new score detail
+        uplift_scores: Object.fromEntries(
+          VALID_CAMPAIGN_TYPES.map(ct => [ct, scores[ct].uplift])
+        ),
+        uplift_score_detail: scores,
+      };
+    });
 
     res.json({
       total,

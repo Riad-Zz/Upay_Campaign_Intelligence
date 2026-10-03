@@ -131,12 +131,31 @@ function getPopulationStats() {
   const fatigued  = customers.filter(c => c.fatigue_status === "suppressed").length;
   const at_risk   = customers.filter(c => c.fatigue_status === "at_risk").length;
 
+  // Campaign opportunity: active, safe customers with meaningful uplift (≥ 10pp on any campaign type)
+  const OPPORTUNITY_THRESHOLD = 0.10;
+  const CAMPAIGN_TYPES_ALL    = ["recharge", "merchant", "p2p", "bill"];
+  let campaign_opportunity_count = 0;
+  let total_incremental_txns_estimate = 0;
+
+  for (const c of customers) {
+    if (c.is_dormant || c.fatigue_status === "suppressed") continue;
+    const hasOpportunity = CAMPAIGN_TYPES_ALL.some(
+      ct => (c.uplift_scores?.[ct]?.uplift ?? 0) >= OPPORTUNITY_THRESHOLD
+    );
+    if (hasOpportunity) campaign_opportunity_count++;
+    // Sum up best uplift per customer as rough incremental txn estimate
+    const bestUplift = Math.max(...CAMPAIGN_TYPES_ALL.map(ct => c.uplift_scores?.[ct]?.uplift ?? 0));
+    total_incremental_txns_estimate += Math.max(0, bestUplift);
+  }
+
   _populationStats = {
     total_customers: total,
     active_customers: active,
     dormant_customers: dormant,
     fatigued_customers: fatigued,
     at_risk_customers: at_risk,
+    campaign_opportunity_count,
+    estimated_incremental_txns: +total_incremental_txns_estimate.toFixed(0),
     segments,
     avg_uplift,
     uplift_distribution,
