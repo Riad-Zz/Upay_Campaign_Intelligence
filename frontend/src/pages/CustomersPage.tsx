@@ -23,7 +23,6 @@ const SORT_OPTIONS = [
 
 const ACTION_FILTER_OPTIONS: { value: string; label: string }[] = [
   { value: 'all',                  label: 'Any Recommended Action' },
-  { value: 'target',               label: 'Target (Standard)' },
   { value: 'target_low_incentive', label: 'Target (Low Incentive)' },
   { value: 'sure_thing',           label: 'Skip — Sure Thing' },
   { value: 'suppressed_fatigue',   label: 'Suppressed — Fatigued' },
