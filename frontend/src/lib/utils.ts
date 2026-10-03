@@ -1,7 +1,7 @@
 // lib/utils.ts
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { CampaignType, Segment, FatigueStatus, UpliftSegment } from '../types';
+import type { CampaignType, Segment, FatigueStatus, UpliftSegment, RecommendedAction } from '../types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -65,11 +65,32 @@ export const UPLIFT_SEGMENT_LABELS: Record<UpliftSegment, string> = {
   do_not_disturb: 'Do Not Disturb',
 };
 
+export const RECOMMENDED_ACTION_LABELS: Record<RecommendedAction, string> = {
+  target:               'Target',
+  target_low_incentive: 'Target (Low Incentive)',
+  sure_thing:           'Skip — Sure Thing',
+  low_value:            'Skip — Low Value',
+  do_not_disturb:       'Suppress — DND',
+  suppressed_fatigue:   'Suppress — Fatigued',
+  do_not_target:        'Do Not Target',
+};
+
 export const CAMPAIGN_TYPE_OPTIONS = [
   { value: 'recharge', label: 'Mobile Recharge Cashback' },
   { value: 'merchant', label: 'Merchant Payment Cashback' },
   { value: 'p2p',      label: 'P2P Transfer Bonus' },
   { value: 'bill',     label: 'Bill Payment Offer' },
+] as const;
+
+export const CAMPAIGN_OBJECTIVE_OPTIONS = [
+  { value: 'increase_recharge',  label: 'Increase Recharge Transactions', type: 'recharge' as CampaignType },
+  { value: 'increase_frequency', label: 'Increase Recharge Frequency',   type: 'recharge' as CampaignType },
+  { value: 'increase_gmv',       label: 'Increase Overall GMV',          type: 'recharge' as CampaignType },
+  { value: 'reactivate_dormant', label: 'Reactivate Dormant Customers',  type: 'recharge' as CampaignType },
+  { value: 'increase_merchant',  label: 'Increase Merchant Payments',    type: 'merchant' as CampaignType },
+  { value: 'increase_p2p',       label: 'Increase P2P Transfers',        type: 'p2p'      as CampaignType },
+  { value: 'increase_bill',      label: 'Increase Bill Payments',        type: 'bill'     as CampaignType },
+  { value: 're_engage_inactive', label: 'Re-engage Inactive Customers',  type: 'recharge' as CampaignType },
 ] as const;
 
 export const SEGMENT_OPTIONS = [
@@ -90,15 +111,15 @@ export const OFFER_VALUE_OPTIONS = [
 // ── Color helpers ─────────────────────────────────────────────────────────────
 
 export function upliftColor(uplift: number): string {
-  if (uplift >= 0.20) return 'text-emerald-400';
-  if (uplift >= 0.10) return 'text-upay-400';
-  if (uplift >= 0.03) return 'text-amber-400';
-  if (uplift >= 0)    return 'text-slate-400';
-  return 'text-red-400';
+  if (uplift >= 0.20) return 'text-emerald-700';
+  if (uplift >= 0.10) return 'text-[#0054A6]';
+  if (uplift >= 0.03) return 'text-amber-700';
+  if (uplift >= 0)    return 'text-slate-500';
+  return 'text-red-700';
 }
 
-export function segmentBadgeClass(segment: Segment): string {
-  const map: Record<Segment, string> = {
+export function segmentBadgeClass(segment: Segment | string): string {
+  const map: Record<string, string> = {
     high_value: 'badge-blue',
     mid:        'badge-green',
     low:        'badge-yellow',
@@ -113,15 +134,28 @@ export function fatigueBadgeClass(status: FatigueStatus): string {
        : 'badge-green';
 }
 
+export function recommendedActionBadgeClass(action: RecommendedAction | string): string {
+  const map: Record<string, string> = {
+    target:               'badge-green',
+    target_low_incentive: 'badge-blue',
+    sure_thing:           'badge-yellow',
+    low_value:            'badge-slate',
+    do_not_disturb:       'badge-red',
+    suppressed_fatigue:   'badge-amber',
+    do_not_target:        'badge-slate',
+  };
+  return map[action] || 'badge-slate';
+}
+
 export function upliftSegmentColor(seg: UpliftSegment): string {
   const map: Record<UpliftSegment, string> = {
-    persuadable:    'text-emerald-400',
-    low_uplift:     'text-upay-400',
-    sure_thing:     'text-amber-400',
-    lost_cause:     'text-slate-400',
-    do_not_disturb: 'text-red-400',
+    persuadable:    'text-emerald-700',
+    low_uplift:     'text-[#0054A6]',
+    sure_thing:     'text-amber-700',
+    lost_cause:     'text-slate-500',
+    do_not_disturb: 'text-red-700',
   };
-  return map[seg] || 'text-slate-400';
+  return map[seg] || 'text-slate-500';
 }
 
 // ── Suppress reason labels ────────────────────────────────────────────────────
@@ -130,9 +164,9 @@ export function suppressReasonLabel(reason: string): string {
   const map: Record<string, string> = {
     fatigue:          'Campaign Fatigue',
     spacing:          'Too Recent',
-    do_not_disturb:   'Do Not Disturb',
-    sure_thing:       'Sure Thing',
-    lost_cause:       'Lost Cause',
+    do_not_disturb:   'Negative Uplift',
+    sure_thing:       'High Baseline — Saves Budget',
+    lost_cause:       'Low Baseline + Low Uplift',
     budget_exhausted: 'Budget Exhausted',
     not_eligible:     'Not Eligible',
   };

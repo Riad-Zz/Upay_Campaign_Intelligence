@@ -6,6 +6,25 @@ export type Segment = 'high_value' | 'mid' | 'low' | 'dormant';
 export type FatigueStatus = 'safe' | 'at_risk' | 'suppressed';
 export type UpliftSegment = 'persuadable' | 'low_uplift' | 'sure_thing' | 'lost_cause' | 'do_not_disturb';
 export type SuppressReason = 'fatigue' | 'spacing' | 'do_not_disturb' | 'sure_thing' | 'lost_cause' | 'budget_exhausted';
+export type RecommendedAction =
+  | 'target'
+  | 'target_low_incentive'
+  | 'sure_thing'
+  | 'low_value'
+  | 'do_not_disturb'
+  | 'suppressed_fatigue'
+  | 'do_not_target';
+
+// Campaign objectives
+export type CampaignObjective =
+  | 'increase_recharge'
+  | 'increase_gmv'
+  | 'reactivate_dormant'
+  | 'increase_merchant'
+  | 'increase_p2p'
+  | 'increase_bill'
+  | 'increase_frequency'
+  | 're_engage_inactive';
 
 // ── Customer ──────────────────────────────────────────────────────────────────
 
@@ -20,6 +39,13 @@ export interface UpliftScoreDetail {
   uplift:          number;
   treatment_prob:  number;
   control_prob:    number;
+}
+
+export interface UpliftScoreDetailMap {
+  recharge: UpliftScoreDetail;
+  merchant: UpliftScoreDetail;
+  p2p:      UpliftScoreDetail;
+  bill:     UpliftScoreDetail;
 }
 
 export interface ExplanationDriver {
@@ -43,14 +69,17 @@ export interface Customer {
   is_dormant:                   boolean;
   campaign_received_last_90d:   number;
   campaign_responded_last_90d:  number;
-  friday_txn_rate:              number;
-  recharge_txn_rate:            number;
-  merchant_txn_rate:            number;
-  p2p_txn_rate:                 number;
-  bill_txn_rate:                number;
+  friday_txn_rate?:             number;
+  recharge_txn_rate?:           number;
+  merchant_txn_rate?:           number;
+  p2p_txn_rate?:                number;
+  bill_txn_rate?:               number;
   days_since_prev_campaign?:    number;
   fatigue_status:               FatigueStatus;
   uplift_scores:                UpliftScores;
+  uplift_score_detail?:         UpliftScoreDetailMap;
+  recommended_action?:          RecommendedAction;
+  recommended_incentive?:       number;
 }
 
 export interface CustomerDetail extends Customer {
@@ -70,11 +99,21 @@ export interface CustomerExplanation {
 // ── Campaign Config ───────────────────────────────────────────────────────────
 
 export interface CampaignConfig {
-  campaign_name:    string;
-  campaign_type:    CampaignType;
-  offer_value_bdt:  number;
-  budget_bdt:       number;
-  target_segment:   'all' | Segment;
+  campaign_name:       string;
+  campaign_type:       CampaignType;
+  campaign_objective?: CampaignObjective;
+  offer_value_bdt:     number;
+  budget_bdt:          number;
+  target_segment:      'all' | Segment;
+}
+
+// ── Incentive Tier ────────────────────────────────────────────────────────────
+
+export interface IncentiveTier {
+  offer_bdt:         number;
+  count:             number;
+  avg_uplift:        number;
+  expected_incr_gmv: number;
 }
 
 // ── Campaign Result ───────────────────────────────────────────────────────────
@@ -92,15 +131,15 @@ export interface RecommendedCustomer {
 }
 
 export interface SuppressedCustomer {
-  customer_id:                 string;
-  segment:                     Segment;
-  reason:                      SuppressReason;
-  detail:                      string;
-  uplift_score?:               number;
-  control_prob?:               number;
-  campaign_received_last_90d?: number;
+  customer_id:                  string;
+  segment:                      Segment;
+  reason:                       SuppressReason;
+  detail:                       string;
+  uplift_score?:                number;
+  control_prob?:                number;
+  campaign_received_last_90d?:  number;
   campaign_responded_last_90d?: number;
-  days_since_prev_campaign?:   number;
+  days_since_prev_campaign?:    number;
 }
 
 export interface UpliftDistribution {
@@ -146,24 +185,29 @@ export interface CampaignSummary {
 }
 
 export interface CampaignResult {
-  campaign_name:       string;
-  campaign_type:       CampaignType;
-  offer_value_bdt:     number;
-  summary:             CampaignSummary;
-  recommended:         RecommendedCustomer[];
-  suppressed_fatigue:  SuppressedCustomer[];
-  suppressed_other:    SuppressedCustomer[];
-  feature_importances: FeatureImportance[];
+  campaign_name:             string;
+  campaign_type:             CampaignType;
+  campaign_objective?:       CampaignObjective | null;
+  campaign_objective_label?: string | null;
+  offer_value_bdt:           number;
+  summary:                   CampaignSummary;
+  incentive_tiers:           IncentiveTier[];
+  recommended:               RecommendedCustomer[];
+  suppressed_fatigue:        SuppressedCustomer[];
+  suppressed_other:          SuppressedCustomer[];
+  feature_importances:       FeatureImportance[];
 }
 
 // ── Population Stats ──────────────────────────────────────────────────────────
 
 export interface PopulationStats {
-  total_customers:    number;
-  active_customers:   number;
-  dormant_customers:  number;
-  fatigued_customers: number;
-  at_risk_customers:  number;
+  total_customers:            number;
+  active_customers:           number;
+  dormant_customers:          number;
+  fatigued_customers:         number;
+  at_risk_customers:          number;
+  campaign_opportunity_count: number;
+  estimated_incremental_txns: number;
   segments: {
     high_value: number;
     mid:        number;
