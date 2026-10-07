@@ -28,14 +28,15 @@ record.
 
 Therefore:
   - The same customer CAN appear in both train and test without leaking the
-    outcome, because the outcomes are independent draws per campaign week.
-  - However, to be conservative and scientifically rigorous, we implement a
-    STRICT customer-level temporal split: a customer is assigned to the LATEST
-    split stratum that contains any of their records.
-  - This means: if a customer has ANY record in the test window, ALL of their
-    records are removed from train/validation to prevent any possibility of the
-    model seeing the same customer's profile during training and then evaluating
-    on that same customer's outcomes in test.
+    outcome, because the outcomes are independent draws per campaign week
+    and customer features are cross-sectional static attributes.
+  - A strict customer-level split (assigning customers strictly to one period)
+    would cause severe data starvation in this synthetic DGP, discarding ~99.9%
+    of training data because campaigns cycle over 52 weeks and target 30-60%
+    of customers per campaign (9,343 of 10,000 customers appear across all periods).
+  - Therefore, strict_customer_split defaults to False, making temporal record-level
+    splitting the primary leakage protection, while strict customer-level splitting
+    remains an available option for reference.
 
 USAGE
 -----
@@ -134,6 +135,7 @@ def describe_splits(
     val_df: pd.DataFrame,
     test_df: pd.DataFrame,
     config: Dict[str, Any],
+    strict_customer_split: bool = False,
 ) -> Dict[str, Any]:
     """
     Return a summary dictionary describing the three splits.
@@ -141,10 +143,10 @@ def describe_splits(
     """
     def _split_stats(df: pd.DataFrame, label: str) -> dict:
         return {
-            "label":         label,
-            "n_records":     len(df),
-            "n_customers":   df["customer_id"].nunique() if "customer_id" in df.columns else None,
-            "treatment_rate": round(df["was_treated"].mean(), 4)  if "was_treated" in df.columns else None,
+            "label":           label,
+            "n_records":       len(df),
+            "n_customers":     df["customer_id"].nunique() if "customer_id" in df.columns else None,
+            "treatment_rate":   round(df["was_treated"].mean(), 4)  if "was_treated" in df.columns else None,
             "conversion_rate": round(df["converted"].mean(), 4)   if "converted"   in df.columns else None,
         }
 
@@ -153,5 +155,5 @@ def describe_splits(
         "train":      _split_stats(train_df, split_cfg["train_label"]),
         "validation": _split_stats(val_df,   split_cfg["validation_label"]),
         "test":       _split_stats(test_df,  split_cfg["test_label"]),
-        "leakage_protection": "strict_customer_split",
+        "leakage_protection": "strict_customer_split" if strict_customer_split else "temporal_record_split",
     }

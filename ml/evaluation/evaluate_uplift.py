@@ -572,11 +572,11 @@ def main():
             "train_period":      CONFIG["split"]["train_label"],
             "validation_period": CONFIG["split"]["validation_label"],
             "test_period":       CONFIG["split"]["test_label"],
-            "leakage_protection": "strict_customer_temporal_split",
+            "leakage_protection": "temporal_record_split",
             "description": (
-                "Chronological split on campaign_week (ISO weeks 1-52). "
-                "Strict customer-level leakage protection: customers appearing "
-                "in test/validation windows are excluded from earlier splits."
+                "Chronological split on campaign_week (ISO weeks 1-52: train 1-39, val 40-47, test 48-52). "
+                "Temporal record-level splitting protects against look-ahead bias while preserving statistical power, "
+                "as campaign exposure outcomes are drawn independently and customer features are cross-sectional."
             ),
         },
         "split_summary": split_info,
