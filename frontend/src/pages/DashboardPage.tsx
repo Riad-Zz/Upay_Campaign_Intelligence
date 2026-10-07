@@ -14,6 +14,7 @@ import { NumberTicker } from '../components/ui/number-ticker';
 import { BlurFade } from '../components/ui/blur-fade';
 import { AnimatedCircularProgress } from '../components/ui/animated-circular-progress';
 import { ShimmerButton } from '../components/ui/shimmer-button';
+import { TargetingComparison } from '../components/dashboard/TargetingComparison';
 import { formatPct, formatNumber, CAMPAIGN_TYPE_LABELS } from '../lib/utils';
 
 export function DashboardPage() {
@@ -254,6 +255,9 @@ export function DashboardPage() {
           />
         </div>
       </BlurFade>
+
+      {/* ── Policy Comparison: Random vs Propensity vs Uplift ─────────── */}
+      <TargetingComparison />
 
       {/* ── Main Data Visualization: Uplift Distribution & Product Lift ─── */}
       <BlurFade delay={0.2}>

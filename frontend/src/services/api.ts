@@ -8,6 +8,7 @@ import type {
   CustomerQueryParams,
   CampaignConfig,
   CampaignResult,
+  PolicyComparisonData,
 } from '../types';
 
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '') + '/api';
@@ -62,3 +63,9 @@ export async function runCampaign(config: CampaignConfig): Promise<CampaignResul
     body: JSON.stringify(config),
   });
 }
+
+/** GET /api/comparison — Lightweight policy comparison benchmark */
+export async function fetchComparison(): Promise<PolicyComparisonData> {
+  return apiFetch<PolicyComparisonData>('/comparison');
+}
+

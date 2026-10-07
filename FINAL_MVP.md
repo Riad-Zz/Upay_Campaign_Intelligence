@@ -44,15 +44,22 @@ We use an **S-Learner (Single-Model Meta-Learner)** built on `GradientBoostingCl
 
 ## Targeting Strategy Comparison
 
-### Propensity Targeting (Conventional)
-- Ranks customers by $P(Y=1 \mid X, T=1)$ descending.
-- **The Trap**: Captures high-frequency users with high baseline conversion (60.6% treated, but 55.5% baseline).
-- **The Result**: 91.5% of treated conversions are organic. 20.9% of campaign budget is wasted on Sure Things.
+The MVP compares random, propensity, and uplift targeting under the same synthetic campaign budget and eligibility rules.
 
-### Uplift Targeting (Upay Campaign Intelligence)
-- Ranks customers by $\tau(X) = P(T=1) - P(T=0)$ descending.
-- **The Breakthrough**: Targets persuadables with lower baseline conversion (19.3%) but massive incremental response (+9.8 pp).
-- **The Result**: 0.0% spend wasted on Sure Things. Generates **+89.7% more incremental transactions** under the exact same budget.
+Propensity targeting prioritizes customers with high conversion probability, while uplift targeting prioritizes customers with high expected incremental response.
+
+All reported business outcomes are model-estimated results from the synthetic dataset and are not real-world campaign results.
+
+### Benchmark Breakdown (Budget ৳50,000 · Fixed Incentive ৳30 · K = 1,666 targets)
+
+| Metric | Random | Propensity (Conventional) | Uplift (Upay Causal ML) | Uplift Advantage |
+|:---|:---:|:---:|:---:|:---:|
+| **Targeted Customers** | 1,666 | 1,666 | 1,666 | Identical budget & audience |
+| **Expected Incremental Txns** | 120.5 | 86.2 | **163.5** | **+89.7% lift** |
+| **Model-Estimated Incr. GMV** | ৳44,603 | ৳30,672 | **৳64,125** | **+109.1% GMV lift** |
+| **Sure-Thing Targets** | 146 (8.8%) | 349 (20.9%) | **0 (0.0%)** | **-100% waste** |
+| **Sure-Thing Spend Wasted** | ৳4,380 | ৳10,470 | **৳0** | **৳10,470 saved** |
+| **Cost per Incremental Txn** | ৳414.9 | ৳579.9 | **৳305.6** | **47.3% more cost-effective** |
 
 ---
 

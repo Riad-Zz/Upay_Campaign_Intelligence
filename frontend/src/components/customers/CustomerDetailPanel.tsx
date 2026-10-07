@@ -115,9 +115,9 @@ export function CustomerDetailPanel({ customerId, onClose }: Props) {
             {/* Without Campaign */}
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">
-                Without Campaign
+                Organic Conversion Probability
               </p>
-              <p className="text-[10px] text-slate-400 mb-1">Baseline organic</p>
+              <p className="text-[10px] text-slate-400 mb-1">Baseline without campaign</p>
               <div className="text-2xl md:text-3xl font-black text-slate-800 font-mono tracking-tight">
                 <NumberTicker
                   value={Math.round(exp.control_prob * 100)}
@@ -129,7 +129,7 @@ export function CustomerDetailPanel({ customerId, onClose }: Props) {
             {/* With Campaign */}
             <div className="bg-blue-50/80 border border-[#0054A6]/30 rounded-xl p-3 text-center shadow-xs">
               <p className="text-[10px] font-bold text-[#0054A6] uppercase tracking-wider mb-0.5">
-                With Campaign
+                Campaign Conversion Probability
               </p>
               <p className="text-[10px] text-[#0054A6]/70 mb-1">Treated response</p>
               <div className="text-2xl md:text-3xl font-black text-[#0054A6] font-mono tracking-tight">
@@ -145,7 +145,7 @@ export function CustomerDetailPanel({ customerId, onClose }: Props) {
           <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-                Incremental Uplift
+                Expected Incremental Lift
               </p>
               <p className="text-[11px] text-slate-600">Net campaign-driven delta</p>
             </div>
