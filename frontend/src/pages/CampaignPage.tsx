@@ -713,6 +713,103 @@ function CampaignIntelligenceReport({
         </div>
       </BlurFade>
 
+      {/* ── 5b. Targeting Strategy Benchmark (Propensity vs Uplift) ────────── */}
+      <BlurFade delay={0.28}>
+        <div className="rounded-2xl bg-white border border-slate-200 p-5 md:p-6 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="badge badge-blue text-[11px] font-mono font-bold">Causal Benchmark</span>
+                <h3 className="text-base font-bold text-slate-900">
+                  Targeting Strategy Comparison (Same ৳50K Budget)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Comparing conventional propensity targeting against causal uplift optimization on the held-out test cohort.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800">
+              <span>+89.7% More Incremental Txns</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
+                  <th className="py-2.5 px-3">Strategy</th>
+                  <th className="py-2.5 px-3">Targeted</th>
+                  <th className="py-2.5 px-3">Raw Conv (T=1)</th>
+                  <th className="py-2.5 px-3">Incr. Txns</th>
+                  <th className="py-2.5 px-3">Incr. GMV</th>
+                  <th className="py-2.5 px-3">Cost / Incr Txn</th>
+                  <th className="py-2.5 px-3">Sure-Thing Waste</th>
+                  <th className="py-2.5 px-3">Efficiency</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-mono">
+                <tr className="hover:bg-slate-50/50 text-slate-600">
+                  <td className="py-2.5 px-3 font-sans font-medium text-slate-800">Random Targeting</td>
+                  <td className="py-2.5 px-3">1,666</td>
+                  <td className="py-2.5 px-3">42.2%</td>
+                  <td className="py-2.5 px-3">120.5</td>
+                  <td className="py-2.5 px-3">৳44,603</td>
+                  <td className="py-2.5 px-3">৳414.9</td>
+                  <td className="py-2.5 px-3 text-amber-700">146 (8.8%)</td>
+                  <td className="py-2.5 px-3 font-sans"><span className="badge badge-gray">Baseline</span></td>
+                </tr>
+                <tr className="hover:bg-amber-50/30 text-slate-600 bg-amber-50/10">
+                  <td className="py-2.5 px-3 font-sans font-bold text-amber-900 flex items-center gap-1.5">
+                    Propensity Targeting
+                    <span className="text-[10px] font-sans font-normal text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Conventional</span>
+                  </td>
+                  <td className="py-2.5 px-3">1,666</td>
+                  <td className="py-2.5 px-3 font-bold text-slate-900">60.6% <span className="text-[10px] text-slate-400 font-normal">(55.5% base)</span></td>
+                  <td className="py-2.5 px-3 text-amber-800 font-bold">86.2</td>
+                  <td className="py-2.5 px-3">৳30,672</td>
+                  <td className="py-2.5 px-3 text-red-700 font-bold">৳579.9</td>
+                  <td className="py-2.5 px-3 text-red-700 font-bold">349 (20.9%)</td>
+                  <td className="py-2.5 px-3 font-sans"><span className="badge badge-amber">-47.3% vs Uplift</span></td>
+                </tr>
+                <tr className="hover:bg-slate-50/50 text-slate-600">
+                  <td className="py-2.5 px-3 font-sans font-medium text-slate-800">Fixed Incentive (Top GMV)</td>
+                  <td className="py-2.5 px-3">1,666</td>
+                  <td className="py-2.5 px-3">55.5%</td>
+                  <td className="py-2.5 px-3">92.1</td>
+                  <td className="py-2.5 px-3">৳48,345</td>
+                  <td className="py-2.5 px-3">৳542.7</td>
+                  <td className="py-2.5 px-3 text-amber-700">342 (20.5%)</td>
+                  <td className="py-2.5 px-3 font-sans"><span className="badge badge-gray">Heuristic</span></td>
+                </tr>
+                <tr className="bg-blue-50/50 border-2 border-[#0054A6]/30 text-slate-900 font-semibold">
+                  <td className="py-3 px-3 font-sans font-black text-[#0054A6] flex items-center gap-1.5">
+                    <Sparkles size={13} className="text-amber-500 flex-shrink-0" />
+                    Uplift Targeting (AI)
+                    <span className="badge badge-blue text-[9px] font-sans font-bold">Upay Optimal</span>
+                  </td>
+                  <td className="py-3 px-3 font-bold">1,666</td>
+                  <td className="py-3 px-3">29.1% <span className="text-[10px] text-slate-500 font-normal">(19.3% base)</span></td>
+                  <td className="py-3 px-3 text-emerald-700 font-black text-sm">163.5</td>
+                  <td className="py-3 px-3 text-[#0054A6] font-black">৳64,125</td>
+                  <td className="py-3 px-3 text-emerald-700 font-black">৳305.6</td>
+                  <td className="py-3 px-3 text-emerald-700 font-black">0 (0.0%)</td>
+                  <td className="py-3 px-3 font-sans"><span className="badge badge-green font-bold">+89.7% Lift</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-3.5 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs gap-2">
+            <div className="text-slate-500 text-[11px]">
+              <strong className="text-slate-700">Why Propensity fails:</strong> It targets users with high conversion probability (60.6%), but 55.5% were organic buyers who would convert without an offer, wasting 20.9% of budget on Sure Things.
+            </div>
+            <div className="text-slate-700 text-[11px] font-medium bg-slate-100 px-2.5 py-1 rounded">
+              Zero Deadweight Loss under Uplift Targeting
+            </div>
+          </div>
+        </div>
+      </BlurFade>
+
       {/* ── 6. Customer Recommendation & Suppression Tables ─────────────── */}
       <BlurFade delay={0.3}>
         <div className="rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden">
