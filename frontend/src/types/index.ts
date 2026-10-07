@@ -248,3 +248,41 @@ export interface CustomerQueryParams {
   order?:         'asc' | 'desc';
   campaign_type?: CampaignType;
 }
+
+// ── Policy Comparison Benchmark ───────────────────────────────────────────────
+
+export interface PolicyStrategyMetrics {
+  targeted: number;
+  avg_uplift: number;
+  incremental_transactions: number;
+  incremental_gmv: number;
+  sure_things: number;
+  sure_thing_percentage: number;
+  wasteful_targets: number;
+  cost_per_incremental_txn?: number;
+  conversion_prob_treatment?: number;
+  baseline_prob_control?: number;
+}
+
+export interface PolicyComparisonData {
+  scenario: {
+    campaign: string;
+    budget: number;
+    incentive: number;
+    target_count: number;
+    eligible_customers?: number;
+    random_seed?: number;
+  };
+  strategies: {
+    random: PolicyStrategyMetrics;
+    propensity: PolicyStrategyMetrics;
+    uplift: PolicyStrategyMetrics;
+  };
+  comparison: {
+    uplift_vs_propensity_txn_lift_pct?: number;
+    uplift_vs_propensity_gmv_lift_pct?: number;
+    sure_thing_spend_saved_bdt?: number;
+    cost_efficiency_improvement_pct?: number;
+  };
+}
+

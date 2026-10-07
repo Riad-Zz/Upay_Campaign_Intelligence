@@ -1,0 +1,54 @@
+{
+  "scenario": {
+    "campaign": "Recharge",
+    "budget": 50000.0,
+    "incentive": 30.0,
+    "target_count": 1666,
+    "eligible_customers": 3893,
+    "random_seed": 42
+  },
+  "strategies": {
+    "random": {
+      "targeted": 1666,
+      "avg_uplift": 0.0723,
+      "incremental_transactions": 120.5,
+      "incremental_gmv": 44603.2,
+      "sure_things": 146,
+      "sure_thing_percentage": 8.8,
+      "wasteful_targets": 168,
+      "cost_per_incremental_txn": 414.9,
+      "conversion_prob_treatment": 42.2,
+      "baseline_prob_control": 35.0
+    },
+    "propensity": {
+      "targeted": 1666,
+      "avg_uplift": 0.0517,
+      "incremental_transactions": 86.2,
+      "incremental_gmv": 30671.6,
+      "sure_things": 349,
+      "sure_thing_percentage": 20.9,
+      "wasteful_targets": 391,
+      "cost_per_incremental_txn": 579.9,
+      "conversion_prob_treatment": 60.6,
+      "baseline_prob_control": 55.5
+    },
+    "uplift": {
+      "targeted": 1666,
+      "avg_uplift": 0.0982,
+      "incremental_transactions": 163.5,
+      "incremental_gmv": 64124.5,
+      "sure_things": 0,
+      "sure_thing_percentage": 0.0,
+      "wasteful_targets": 0,
+      "cost_per_incremental_txn": 305.6,
+      "conversion_prob_treatment": 29.1,
+      "baseline_prob_control": 19.3
+    }
+  },
+  "comparison": {
+    "uplift_vs_propensity_txn_lift_pct": 89.7,
+    "uplift_vs_propensity_gmv_lift_pct": 109.1,
+    "sure_thing_spend_saved_bdt": 10470.0,
+    "cost_efficiency_improvement_pct": 47.3
+  }
+}
