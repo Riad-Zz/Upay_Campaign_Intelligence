@@ -368,7 +368,10 @@ The project is structured as an interactive prototype designed for live verifica
 13. **Explore Customer Profiles**: Click on **Customer Explorer** in the sidebar. Search for any customer (e.g., `CUST_07106` or `CUST_09188`).
 14. **Inspect Counterfactual Panel**: Click a customer row to open the causal inspector. Compare the organic baseline probability vs. treated response probability, review individual feature drivers, and check fatigue warnings.
 
-> **Automated Test Suite Notice**: As a hackathon prototype, automated test suites (e.g., Jest/PyTest) are not configured. Verification is conducted via the end-to-end interactive workflow outlined above and TypeScript compilation checks (`npm run build`).
+> **Automated Test Suite Notice**: The project includes dedicated automated causal evaluation suites:
+> - `python ml/test_phase1.py` (56/56 passing): Unit tests for temporal splitting, leakage protection, Qini/AUUC math, and seed determinism.
+> - `python ml/test_phase2.py` (28/28 passing): Integration tests for controlled policy benchmarking, Sure Thing suppression, and JSON reporting.
+> - `npm run build`: Production TypeScript compilation and bundle verification.
 
 ---
 
@@ -383,7 +386,7 @@ Upay_Campaign_Intelligence/
 │   │   ├── customerController.js       # Customer directory, pagination, & recommendations
 │   │   └── statsController.js          # Population overview & aggregate statistics
 │   ├── routes/
-│   │   └── api.js                      # API route definitions
+│   │   └── api.js                      # API route definitions (incl. /api/comparison)
 │   ├── services/
 │   │   ├── campaignEngine.js           # Campaign orchestration & objective mapping
 │   │   ├── dataService.js              # Artifact data loader & statistics calculator
@@ -392,9 +395,13 @@ Upay_Campaign_Intelligence/
 │   ├── package.json
 │   ├── server.js                       # Express app entrypoint & middleware
 │   └── vercel.json                     # Backend Vercel serverless configuration
-├── data/                               # Pre-computed ML artifacts & datasets
+├── data/                               # Pre-computed ML artifacts & benchmark reports
 │   ├── customers.json                  # 10,000 synthetic customer behavioral profiles
+│   ├── model_evaluation.json           # Phase 1 causal evaluation metrics (Qini, AUUC, ATE)
 │   ├── model_meta.json                 # Feature importances, distributions, & explanations
+│   ├── policy_benchmark.json           # Phase 2 controlled 4-policy benchmark report
+│   ├── policy_comparison.json          # Lightweight 3-policy comparison for Dashboard
+│   ├── s_learner_eval_model.joblib     # Pre-trained evaluation model cache
 │   └── uplift_scores.json              # Pre-computed S-Learner uplift scores across 4 channels
 ├── frontend/                           # React + TypeScript + Vite SPA
 │   ├── public/
@@ -407,6 +414,8 @@ Upay_Campaign_Intelligence/
 │   │   ├── components/
 │   │   │   ├── customers/
 │   │   │   │   └── CustomerDetailPanel.tsx  # Counterfactual comparison slide-out
+│   │   │   ├── dashboard/
+│   │   │   │   └── TargetingComparison.tsx  # Policy comparison cards & visual bars
 │   │   │   ├── layout/
 │   │   │   │   └── Sidebar.tsx              # Responsive Upay-branded navigation
 │   │   │   ├── shared/
@@ -429,10 +438,21 @@ Upay_Campaign_Intelligence/
 │   ├── tsconfig.json
 │   ├── vercel.json                     # Frontend Vercel SPA routing configuration
 │   └── vite.config.ts
-├── ml/                                 # Python ML pipeline (offline generation & training)
+├── ml/                                 # Python ML pipeline & causal evaluation suite
+│   ├── evaluation/                     # Causal evaluation modules
+│   │   ├── benchmark_policies.py       # Controlled 4-policy targeting benchmark
+│   │   ├── evaluate_uplift.py          # S-Learner causal training & evaluation
+│   │   ├── generate_policy_comparison.py # Lightweight JSON comparison generator
+│   │   ├── metrics.py                  # Qini, AUUC, Uplift@k%, Policy Value
+│   │   └── temporal_split.py           # 52-week chronological split & leakage protection
+│   ├── experiment_config.py            # Centralized seeds, windows, & feature schemas
 │   ├── generate_data.py                # Synthetic customer & campaign history generator
 │   ├── requirements.txt                # Python dependencies (scikit-learn, pandas, numpy)
+│   ├── test_phase1.py                  # Phase 1 unit test suite (56 tests)
+│   ├── test_phase2.py                  # Phase 2 benchmark test suite (28 tests)
 │   └── train_model.py                  # S-Learner training, scoring, & explanation pipeline
+├── FINAL_MVP.md                        # Executive MVP summary & benchmark findings
+├── phase2.md                           # Phase 1 & Phase 2 technical specification
 ├── hosting.md                          # Detailed Vercel deployment guide
 ├── Product.md                          # Product specification & problem formulation
 └── README.md                           # Master project documentation
@@ -478,3 +498,99 @@ Campaign Impact Estimation (Expected Incremental Transactions, GMV, & ROI Multip
 3. **Fatigue Mitigation**: The system explicitly embeds negative feedback protection to prioritize long-term user trust over short-term campaign reach.
 4. **Human-in-the-Loop Governance**: The platform operates as an intelligence and decision-support system. Final campaign launch decisions, budget authorizations, and creative content remain under human marketing manager control.
 5. **Production Validation**: For real-world MFS deployment, uplift estimates must be continuously calibrated and validated via randomized controlled A/B experiments (treatment vs. holdout control groups) to measure actual incremental business lift.
+
+---
+
+## 15. What Was Updated & Changed (Phase 1 & Phase 2 Evolution)
+
+Based on hackathon evaluation and judge feedback, the repository was significantly advanced from an initial conceptual prototype into an end-to-end, scientifically grounded decision system featuring **Phase 1 (Causal Evaluation Foundation)** and **Phase 2 (Controlled Targeting Strategy Benchmark)**.
+
+### Why This Update Was Needed
+
+1. **The "Propensity Trap" in Marketing**:
+   Conventional MFS campaign engines prioritize customers using standard response propensity models ($P(Y=1 \mid \text{treatment})$), which optimize for:
+   > *"Who is most likely to make a transaction?"*
+   
+   - **The Deadweight Loss**: Propensity models disproportionately target organic loyalists (**"Sure Things"**) who already convert at high rates (e.g., 55.5% organic baseline). Offering them subsidies wastes marketing budget paying for transactions that would have occurred anyway.
+   - **The Causal Uplift Solution**: Causal uplift modeling ($\tau(X) = P(Y=1 \mid T=1) - P(Y=1 \mid T=0)$) reframes the objective around:
+   > *"Who will transact **only because** they received this campaign?"*
+   
+   This concentrates incentives on **"Persuadables"**—driving genuine incremental transactions while eliminating deadweight incentive waste.
+
+2. **Causal Evaluation Rigor (Beyond Classification ROC-AUC)**:
+   In earlier iterations, ML models were evaluated with standard classification metrics (accuracy, ROC-AUC) on random train/test splits. However, standard ROC-AUC only measures correlation with organic behavior—a model could achieve high ROC-AUC simply by identifying frequent transactors, while producing zero incremental business lift. Rigorous causal models require specialized uplift metrics: **Qini curve, AUUC (Area Under the Uplift Curve), and Uplift@k%**.
+
+3. **Temporal Leakage Protection**:
+   Random splits across time leak future user activity into training data. Production causal systems require strict chronological partitioning (training on historical weeks, testing on future held-out weeks) to avoid lookahead bias.
+
+---
+
+### What Was Updated & Changed
+
+#### 1. Phase 1 — Causal Evaluation Foundation (`ml/evaluation/`)
+- **Strict Chronological Temporal Splits (`ml/evaluation/temporal_split.py`)**:
+  - Partitioned 52 calendar weeks of campaign records into:
+    - **Train Window**: Weeks 1–39 (75% of calendar history)
+    - **Validation Window**: Weeks 40–47 (15% of calendar history)
+    - **Held-Out Test Window**: Weeks 48–52 (10% of calendar history; $N = 20,984$ interactions, zero future leakage).
+  - Enforced complete chronological separation (`train_max < val_min < test_min`).
+- **Causal Metric Engine (`ml/evaluation/metrics.py`)**:
+  - Implemented **Qini Curve & Qini Coefficient** (normalized against random baseline).
+  - Implemented **AUUC (Area Under the Uplift Curve)** measuring incremental area over average treatment effect (ATE).
+  - Implemented **Uplift@10% and Uplift@20%** measuring empirical response concentration in top-ranked cohorts.
+  - Held-out test performance: **Qini = 0.0131**, **AUUC = 0.0461**, **Uplift@10% = +18.86pp** vs. +8.08pp population ATE.
+- **Deterministic Experiment Hub (`ml/experiment_config.py`)**:
+  - Centralized random seeds (`dataset_seed = 42`, `model_seed = 42`), feature schemas, and temporal cutoffs.
+- **Automated Phase 1 Test Suite (`ml/test_phase1.py`)**:
+  - 56 passing unit tests validating week parsing, temporal leakage protection, Qini/AUUC mathematical properties, and seed reproducibility.
+
+---
+
+#### 2. Phase 2 & Final MVP — Controlled Targeting Strategy Benchmark (`ml/evaluation/`)
+- **Controlled Benchmark Engine (`ml/evaluation/benchmark_policies.py`)**:
+  - Implemented a controlled head-to-head comparison evaluating 4 targeting strategies under identical real-world conditions:
+    - **Campaign Scenario**: Mobile Recharge
+    - **Campaign Budget**: ৳50,000 BDT
+    - **Fixed Incentive**: ৳30 BDT per customer
+    - **Target Count**: $K = \lfloor 50,000 / 30 \rfloor = 1,666$ customers
+    - **Common Eligible Pool**: 3,893 customers from the held-out test cohort (Weeks 48–52) after identical dormancy filtering and fatigue suppression rules.
+    - **Random Seed**: 42 (deterministic reproducibility)
+
+- **Empirical Benchmark Results (Held-Out Test Set)**:
+
+| Metric | Random Targeting | Propensity (Conventional) | Fixed Incentive (Top GMV) | Uplift Targeting (Upay AI) | Uplift Advantage vs. Propensity |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **Targeted Customers** | 1,666 | 1,666 | 1,666 | **1,666** | Identical budget parity |
+| **Incentive Spend** | ৳49,980 | ৳49,980 | ৳49,980 | **৳49,980** | 100% budget parity |
+| **Treated Conv. Rate ($T=1$)** | 42.2% | 60.6% | 55.5% | **29.1%** | Uplift targets lower-baseline users |
+| **Baseline Conv. Rate ($T=0$)** | 35.0% | 55.5% | 50.0% | **19.3%** | Propensity targets organic buyers |
+| **Mean Predicted Uplift** | +7.23% | +5.17% | +5.53% | **+9.82%** | **Nearly 2× incremental lift** |
+| **Expected Incremental Txns** | 120.5 | 86.2 | 92.1 | **163.5** | **+89.7% more incremental transactions** |
+| **Ground-Truth True Lift (ITE)** | 202.3 | 165.1 | 164.2 | **239.7** | **+45.2% true causal lift** |
+| **Model-Est. Incremental GMV** | ৳44,603 | ৳30,672 | ৳48,345 | **৳64,125** | **+109.1% higher GMV lift** |
+| **Cost per Incremental Txn** | ৳414.9 | ৳579.9 | ৳542.7 | **৳305.6** | **47.3% more cost-effective** |
+| **Sure-Thing Targets Wasted** | 146 (8.8%) | 349 (20.9%) | 342 (20.5%) | **0 (0.0%)** | **100% elimination of deadweight loss** |
+| **Sure-Thing Spend Wasted** | ৳4,380 | ৳10,470 | ৳10,260 | **৳0** | **৳10,470 saved from being wasted** |
+| **Fatigue Risk Overlaps** | 328 | 545 | 494 | **14** | **97.4% reduction in fatigue collisions** |
+
+- **Key Takeaway**:
+  Under propensity targeting, **20.9% of the marketing budget (৳10,470)** is squandered paying users who would convert anyway (55.5% organic baseline). Uplift targeting completely eliminates this deadweight loss (0 Sure Things), concentrating incentives on persuadables to generate **+89.7% more incremental transactions** and **+109.1% more incremental GMV**.
+
+---
+
+#### 3. Full-Stack UI & API Integration
+- **Policy Comparison Generator (`ml/evaluation/generate_policy_comparison.py`)**:
+  Generates `data/policy_comparison.json` for fast runtime ingestion.
+- **Backend API Endpoint (`backend/routes/api.js`)**:
+  Added `GET /api/comparison` returning the structured JSON comparison with automatic fallback.
+- **Frontend Dashboard Comparison Component (`frontend/src/components/dashboard/TargetingComparison.tsx`)**:
+  - Added directly below the Operations Console KPI strip on the Dashboard (`frontend/src/pages/DashboardPage.tsx`).
+  - Displays three side-by-side strategy cards: **Random**, **Propensity**, and **Uplift (Recommended)**.
+  - Interactive horizontal visual comparison bars comparing Expected Incremental Transactions.
+  - Plain-English insight box explaining the core economic distinction.
+- **Customer Explorer Refinements (`frontend/src/components/customers/CustomerDetailPanel.tsx`)**:
+  - Enhanced counterfactual metric labels: **Organic Conversion Probability**, **Campaign Conversion Probability**, and **Expected Incremental Lift**.
+- **Automated Verification Suites**:
+  - `python ml/test_phase1.py` (56/56 passing)
+  - `python ml/test_phase2.py` (28/28 passing)
+
